@@ -4,4 +4,16 @@
    <FileRef
       location = "group:SynchronizedSwift/SynchronizedSwift.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:Gemfile">
+   </FileRef>
+   <FileRef
+      location = "group:Gemfile.lock">
+   </FileRef>
+   <FileRef
+      location = "group:LICENSE">
+   </FileRef>
+   <FileRef
+      location = "group:fastlane">
+   </FileRef>
 </Workspace>
