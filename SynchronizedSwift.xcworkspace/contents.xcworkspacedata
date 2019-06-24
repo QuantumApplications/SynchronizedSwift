@@ -5,6 +5,9 @@
       location = "group:SynchronizedSwift/SynchronizedSwift.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:.travis.yml">
+   </FileRef>
+   <FileRef
       location = "group:Gemfile">
    </FileRef>
    <FileRef
