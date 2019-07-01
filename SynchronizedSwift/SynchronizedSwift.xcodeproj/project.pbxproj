@@ -8,8 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		9F0E355D22C155200056A5E0 /* SynchronizedSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F0E355322C155200056A5E0 /* SynchronizedSwift.framework */; };
-		9F0E356222C155200056A5E0 /* SynchronizedSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E356122C155200056A5E0 /* SynchronizedSwiftTests.swift */; };
+		9F0E356222C155200056A5E0 /* SynchronizedArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E356122C155200056A5E0 /* SynchronizedArrayTests.swift */; };
 		9F0E356422C155200056A5E0 /* SynchronizedSwift.h in Headers */ = {isa = PBXBuildFile; fileRef = 9F0E355622C155200056A5E0 /* SynchronizedSwift.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9FA11B1222C1576400D04B1D /* SynchronizedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA11B1122C1576400D04B1D /* SynchronizedArray.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,8 +28,9 @@
 		9F0E355622C155200056A5E0 /* SynchronizedSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SynchronizedSwift.h; sourceTree = "<group>"; };
 		9F0E355722C155200056A5E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9F0E355C22C155200056A5E0 /* SynchronizedSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SynchronizedSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9F0E356122C155200056A5E0 /* SynchronizedSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedSwiftTests.swift; sourceTree = "<group>"; };
+		9F0E356122C155200056A5E0 /* SynchronizedArrayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedArrayTests.swift; sourceTree = "<group>"; };
 		9F0E356322C155200056A5E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9FA11B1122C1576400D04B1D /* SynchronizedArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedArray.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 			children = (
 				9F0E355622C155200056A5E0 /* SynchronizedSwift.h */,
 				9F0E355722C155200056A5E0 /* Info.plist */,
+				9FA11B1122C1576400D04B1D /* SynchronizedArray.swift */,
 			);
 			path = SynchronizedSwift;
 			sourceTree = "<group>";
@@ -80,7 +83,7 @@
 		9F0E356022C155200056A5E0 /* SynchronizedSwiftTests */ = {
 			isa = PBXGroup;
 			children = (
-				9F0E356122C155200056A5E0 /* SynchronizedSwiftTests.swift */,
+				9F0E356122C155200056A5E0 /* SynchronizedArrayTests.swift */,
 				9F0E356322C155200056A5E0 /* Info.plist */,
 			);
 			path = SynchronizedSwiftTests;
@@ -148,6 +151,7 @@
 				TargetAttributes = {
 					9F0E355222C155200056A5E0 = {
 						CreatedOnToolsVersion = 10.2.1;
+						LastSwiftMigration = 1020;
 					};
 					9F0E355B22C155200056A5E0 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -194,6 +198,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9FA11B1222C1576400D04B1D /* SynchronizedArray.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,7 +206,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9F0E356222C155200056A5E0 /* SynchronizedSwiftTests.swift in Sources */,
+				9F0E356222C155200056A5E0 /* SynchronizedArrayTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,6 +346,7 @@
 		9F0E356822C155200056A5E0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -357,6 +363,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = qa.quantum.SynchronizedSwift;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -365,6 +372,7 @@
 		9F0E356922C155200056A5E0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -389,6 +397,7 @@
 		9F0E356B22C155200056A5E0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = SynchronizedSwiftTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -406,6 +415,7 @@
 		9F0E356C22C155200056A5E0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = SynchronizedSwiftTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
