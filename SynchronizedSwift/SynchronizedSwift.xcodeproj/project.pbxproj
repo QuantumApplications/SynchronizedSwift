@@ -11,6 +11,7 @@
 		9F0E356222C155200056A5E0 /* SynchronizedArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0E356122C155200056A5E0 /* SynchronizedArrayTests.swift */; };
 		9F0E356422C155200056A5E0 /* SynchronizedSwift.h in Headers */ = {isa = PBXBuildFile; fileRef = 9F0E355622C155200056A5E0 /* SynchronizedSwift.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9FA11B1222C1576400D04B1D /* SynchronizedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA11B1122C1576400D04B1D /* SynchronizedArray.swift */; };
+		D296A97E22CB706000A1DE71 /* ArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D296A97D22CB706000A1DE71 /* ArrayTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,6 +32,7 @@
 		9F0E356122C155200056A5E0 /* SynchronizedArrayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedArrayTests.swift; sourceTree = "<group>"; };
 		9F0E356322C155200056A5E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9FA11B1122C1576400D04B1D /* SynchronizedArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedArray.swift; sourceTree = "<group>"; };
+		D296A97D22CB706000A1DE71 /* ArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +85,7 @@
 		9F0E356022C155200056A5E0 /* SynchronizedSwiftTests */ = {
 			isa = PBXGroup;
 			children = (
+				D296A97D22CB706000A1DE71 /* ArrayTests.swift */,
 				9F0E356122C155200056A5E0 /* SynchronizedArrayTests.swift */,
 				9F0E356322C155200056A5E0 /* Info.plist */,
 			);
@@ -207,6 +210,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F0E356222C155200056A5E0 /* SynchronizedArrayTests.swift in Sources */,
+				D296A97E22CB706000A1DE71 /* ArrayTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

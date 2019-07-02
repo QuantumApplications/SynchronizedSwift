@@ -1,34 +1,37 @@
 //
-//  SynchronizedArrayTests.swift
+//  ArrayTests.swift
 //  SynchronizedSwiftTests
 //
-//  Created by Christian Oberdörfer on 24.06.19.
+//  Created by Christian Oberdörfer on 02.07.19.
 //  Copyright © 2019 Christian Oberdörfer. All rights reserved.
 //
 
 import XCTest
 @testable import SynchronizedSwift
 
-class SynchronizedArrayTests: XCTestCase {
+enum TestError: Error {
+    case expectedError
+}
 
-    var array1 = SynchronizedArray<Int>()
-    var array2 = SynchronizedArray<Int>()
-    var addedArray = SynchronizedArray<Int>()
+class ArrayTests: XCTestCase {
+
+    var array1 = Array<Int>()
+    var array2 = Array<Int>()
+    var addedArray = Array<Int>()
     let array1Capacity = 5
     let array1Sum = 10
-    let array1Swapped = SynchronizedArray<Int>([1, 0, 3, 2, 4])
-    let nonSynchronizedArray2 = Array<Int>([5, 6, 7, 8, 9])
-    let array1ReplacedSubrage = SynchronizedArray<Int>([0, 1, 1, 1, 1, 1, 4])
-    var arrayBytes = SynchronizedArray<Int32>([0, 0])
+    let array1Swapped = Array<Int>([1, 0, 3, 2, 4])
+    let array1ReplacedSubrage = Array<Int>([0, 1, 1, 1, 1, 1, 4])
+    var arrayBytes = Array<Int32>([0, 0])
     let byteValues: [UInt8] = [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00]
-    let array1ReplacedBytes = SynchronizedArray<Int32>([1, 2])
+    let array1ReplacedBytes = Array<Int32>([1, 2])
     let array1Doubled = Array<Int>([0, 2, 4, 6, 8])
     let array1Last = 4
 
     override func setUp() {
-        self.array1 = SynchronizedArray<Int>([0, 1, 2, 3, 4])
-        self.array2 = SynchronizedArray<Int>([5, 6, 7, 8, 9])
-        self.addedArray = SynchronizedArray<Int>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        self.array1 = Array<Int>([0, 1, 2, 3, 4])
+        self.array2 = Array<Int>([5, 6, 7, 8, 9])
+        self.addedArray = Array<Int>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     }
 
     // MARK: - Array
@@ -43,22 +46,9 @@ class SynchronizedArrayTests: XCTestCase {
         XCTAssertEqual(self.array1 + self.array2, self.addedArray)
     }
 
-    func testAddNonSynchronized() {
-        // 3. Assert
-        XCTAssertEqual(self.array1 + self.nonSynchronizedArray2, self.addedArray)
-    }
-
     func testAppend() {
         // 2. Action
         self.array1 += self.array2
-
-        // 3. Assert
-        XCTAssertEqual(self.array1, self.addedArray)
-    }
-
-    func testAppendNonSynchronized() {
-        // 2. Action
-        self.array1 += self.nonSynchronizedArray2
 
         // 3. Assert
         XCTAssertEqual(self.array1, self.addedArray)
@@ -120,11 +110,10 @@ class SynchronizedArrayTests: XCTestCase {
 
     func testReplaceSubrange() {
         // 2. Action
-        self.array1.replaceSubrange(1..<4, with: repeatElement(1, count: 5)) {
-            // 3. Assert
-            XCTAssertEqual(self.array1, self.array1ReplacedSubrage)
-        }
+        self.array1.replaceSubrange(1..<4, with: repeatElement(1, count: 5))
 
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1ReplacedSubrage)
     }
 
     func testWithUnsafeMutableBytes() {
