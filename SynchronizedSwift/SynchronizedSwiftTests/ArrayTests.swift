@@ -27,6 +27,14 @@ class ArrayTests: XCTestCase {
     let array1ReplacedBytes = Array<Int32>([1, 2])
     let array1Doubled = Array<Int>([0, 2, 4, 6, 8])
     let array1Last = 4
+    let array1Partitioned = Array<Int>([4, 3, 2, 1, 0])
+    let array1String = Array<String>(["0", "1", "two", "three", "4"])
+    let array1Compact = Array<Int>([0, 1, 4])
+    let array1SwappedAt1 = Array<Int>([1, 0, 2, 3, 4])
+    let array1Range = 0..<5
+    let array1Repeated = Array<Int>([0, 0, 0, 0, 0])
+    let array1Appended = Array<Int>([0, 1, 2, 3, 4, 5])
+    let array1Inserted = Array<Int>([0, 5, 1, 2, 3, 4])
 
     override func setUp() {
         self.array1 = Array<Int>([0, 1, 2, 3, 4])
@@ -46,7 +54,7 @@ class ArrayTests: XCTestCase {
         XCTAssertEqual(self.array1 + self.array2, self.addedArray)
     }
 
-    func testAppend() {
+    func testAppendOperator() {
         // 2. Action
         self.array1 += self.array2
 
@@ -210,6 +218,193 @@ class ArrayTests: XCTestCase {
         XCTAssertThrowsError(try firstIndexThrows()) { error in
             XCTAssertEqual(error as! TestError, TestError.expectedError)
         }
+    }
+
+    func testLastWhere() {
+        // 3. Assert
+        XCTAssertEqual(self.array1.last { $0 < 2 }, 1)
+    }
+
+    func lastWhereThrows() throws {
+        // 2. Action
+        _ = try self.array1.last { array in
+            throw TestError.expectedError
+        }
+    }
+
+    func testLastWhereException() {
+        // 3. Assert
+        XCTAssertThrowsError(try lastWhereThrows()) { error in
+            XCTAssertEqual(error as! TestError, TestError.expectedError)
+        }
+    }
+
+    func testLastIndexWhere() {
+        // 3. Assert
+        XCTAssertEqual(self.array1.lastIndex { $0 < 2 }, 1)
+    }
+
+    func lastIndexWhereThrows() throws {
+        // 2. Action
+        _ = try self.array1.lastIndex { array in
+            throw TestError.expectedError
+        }
+    }
+
+    func testLastIndexWhereException() {
+        // 3. Assert
+        XCTAssertThrowsError(try lastIndexWhereThrows()) { error in
+            XCTAssertEqual(error as! TestError, TestError.expectedError)
+        }
+    }
+
+    func testPartition() {
+        // 2. Action
+        let firstIndex = self.array1.partition { $0 < 2 }
+
+        // 3. Assert
+        XCTAssertEqual(firstIndex, 3)
+        XCTAssertEqual(self.array1, self.array1Partitioned)
+    }
+
+    func partitionThrows() throws {
+        // 2. Action
+        _ = try self.array1.partition { array in
+            throw TestError.expectedError
+        }
+    }
+
+    func testPartitionThrowsException() {
+        // 3. Assert
+        XCTAssertThrowsError(try partitionThrows()) { error in
+            XCTAssertEqual(error as! TestError, TestError.expectedError)
+        }
+    }
+
+    func testShuffledUsingGenerator() {
+        // 1. Arrange
+        var randomNumberGenerator = SystemRandomNumberGenerator()
+
+        // 3. Assert
+        XCTAssertNotEqual(self.array1.shuffled(using: &randomNumberGenerator), self.array1)
+    }
+
+    func testShuffled() {
+        // 3. Assert
+        XCTAssertNotEqual(self.array1.shuffled(), self.array1)
+    }
+
+    func testShuffleUsingGenerator() {
+        // 1. Arrange
+        var randomNumberGenerator = SystemRandomNumberGenerator()
+
+        // 2. Action
+        self.array1.shuffle(using: &randomNumberGenerator)
+
+        // 3. Assert
+        XCTAssertNotEqual(self.array1, self.array2)
+    }
+
+    func testShuffle() {
+        // 2. Action
+        self.array1.shuffle()
+
+        // 3. Assert
+        XCTAssertNotEqual(self.array1, self.array2)
+    }
+
+    func testFlatMap() {
+        // 3. Assert
+        XCTAssertEqual(self.array1String.flatMap { Int($0) }, self.array1Compact)
+    }
+
+    func flatMapThrows() throws {
+        // 2. Action
+        _ = try self.array1.flatMap { array in
+            throw TestError.expectedError
+        }
+    }
+
+    func testFlatMapThrowsException() {
+        // 3. Assert
+        XCTAssertThrowsError(try flatMapThrows()) { error in
+            XCTAssertEqual(error as! TestError, TestError.expectedError)
+        }
+    }
+
+    func testWithContiguousMutableStorageIfAvailable() {
+        // 2. Action
+        let sum = self.array1.withContiguousMutableStorageIfAvailable { buffer -> Int in
+            var result = 0
+            for i in stride(from: buffer.startIndex, to: buffer.endIndex, by: 1) {
+                result += buffer[i]
+            }
+            return result
+        }
+
+        // 3. Assert
+        XCTAssertEqual(sum, self.array1Sum)
+    }
+
+    func withContiguousMutableStorageIfAvailableThrows() throws {
+        // 2. Action
+        _ = try self.array1.withContiguousMutableStorageIfAvailable { buffer -> Int in
+            throw TestError.expectedError
+        }
+    }
+
+    func testWithContiguousMutableStorageIfAvailableException() {
+        // 3. Assert
+        XCTAssertThrowsError(try withContiguousMutableStorageIfAvailableThrows()) { error in
+            XCTAssertEqual(error as! TestError, TestError.expectedError)
+        }
+    }
+
+    func testSwapAt() {
+        // 2.Action
+        self.array1.swapAt(0, 1)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1SwappedAt1)
+    }
+
+    func testIndices() {
+        // 3. Assert
+        XCTAssertEqual(self.array1.indices, array1Range)
+    }
+
+    func testInitRepeating() {
+        // 3. Assert
+        XCTAssertEqual(Array(repeating: 0, count: 5), self.array1Repeated)
+    }
+
+    func testInitSequence() {
+        // 3. Assert
+        XCTAssertEqual(Array(Set(self.array2)).sorted(), self.array2)
+    }
+
+    func testAppend() {
+        // 2. Action
+        self.array1.append(5)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1Appended)
+    }
+
+    func testAppendSequence() {
+        // 2. Action
+        self.array1.append(contentsOf: self.array2)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.addedArray)
+    }
+
+    func testInsert() {
+        // 2. Action
+        self.array1.insert(5, at: 1)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1Inserted)
     }
 
 }

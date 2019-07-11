@@ -16,6 +16,7 @@ public extension Collection {
 
 }
 
+/// An ordered, random-access collection.
 public class SynchronizedArray<Element> {
 
     private let queue = DispatchQueue(label: "qa.quantum.SynchronizedSwift.SynchronizedArray", attributes: .concurrent)
@@ -169,17 +170,17 @@ public class SynchronizedArray<Element> {
     // TODO suffix
 
     // Needs to be defined with and without throws because rethrows is not possible in queue
-    public func map<T>(_ transform: (Element)-> T) -> [T] {
-        let function = map as ((Element) throws -> T) throws -> [T]
+    public func map<T>(_ transform: (Element)-> T) -> SynchronizedArray<T> {
+        let function = map as ((Element) throws -> T) throws -> SynchronizedArray<T>
         return try! function(transform)
     }
 
-    public func map<T>(_ transform: (Element) throws -> T) throws -> [T] {
-        var result: [T]!
+    public func map<T>(_ transform: (Element) throws -> T) throws -> SynchronizedArray<T> {
+        var result: SynchronizedArray<T>!
         var queueError: Error?
         self.queue.sync {
             do {
-                try result = self.array.map(transform)
+                try result = SynchronizedArray<T>(self.array.map(transform))
             } catch let error {
                 queueError = error
             }
@@ -234,8 +235,176 @@ public class SynchronizedArray<Element> {
         return result
     }
 
+    // Needs to be defined with and without throws because rethrows is not possible in queue
+    public func last(where predicate: (Element) -> Bool) -> Element? {
+        let function = last as ((Element) throws -> Bool) throws -> Element?
+        return try! function(predicate)
+    }
 
+    public func last(where predicate: (Element) throws -> Bool) throws -> Element? {
+        var result: Element?
+        var queueError: Error?
+        self.queue.sync {
+            do {
+                try result = self.array.last(where: predicate)
+            } catch let error {
+                queueError = error
+            }
+        }
+        if queueError != nil {
+            throw queueError!
+        }
+        return result
+    }
 
+    // Needs to be defined with and without throws because rethrows is not possible in queue
+    public func lastIndex(where predicate: (Element) -> Bool) -> Int? {
+        let function = lastIndex as ((Element) throws -> Bool) throws -> Int?
+        return try! function(predicate)
+    }
+
+    public func lastIndex(where predicate: (Element) throws -> Bool) throws -> Int? {
+        var result: Int?
+        var queueError: Error?
+        self.queue.sync {
+            do {
+                try result = self.array.lastIndex(where: predicate)
+            } catch let error {
+                queueError = error
+            }
+        }
+        if queueError != nil {
+            throw queueError!
+        }
+        return result
+    }
+
+    // Needs to be defined with and without throws because rethrows is not possible in queue
+    public func partition(by belongsInSecondPartition: (Element) -> Bool) -> Int {
+        let function = partition as ((Element) throws -> Bool) throws -> Int
+        return try! function(belongsInSecondPartition)
+    }
+
+    public func partition(by belongsInSecondPartition: (Element) throws -> Bool) throws -> Int {
+        var result: Int!
+        var queueError: Error?
+        self.queue.sync {
+            do {
+                try result = self.array.partition(by: belongsInSecondPartition)
+            } catch let error {
+                queueError = error
+            }
+        }
+        if queueError != nil {
+            throw queueError!
+        }
+        return result
+    }
+
+    public func shuffled<T>(using generator: inout T) -> SynchronizedArray where T : RandomNumberGenerator {
+        var result: SynchronizedArray!
+        self.queue.sync { result = SynchronizedArray(self.array.shuffled(using: &generator)) }
+        return result
+    }
+
+    public func shuffled() -> SynchronizedArray {
+        var result: SynchronizedArray!
+        self.queue.sync { result = SynchronizedArray(self.array.shuffled()) }
+        return result
+    }
+
+    // Must be synchronous because of inout parameter
+    public func shuffle<T>(using generator: inout T) where T : RandomNumberGenerator {
+        self.queue.sync { self.array.shuffle(using: &generator) }
+    }
+
+    public func shuffle(completion: (() -> Void)? = nil) {
+        self.queue.async(flags: .barrier) {
+            self.array.shuffle()
+            self.completionQueue.async(flags: .barrier) { completion?() }
+        }
+    }
+
+    // TODO public var lazy: LazySequence<Array<Element>> { get }
+
+    // Needs to be defined with and without throws because rethrows is not possible in queue
+    @available(swift, deprecated: 4.1, renamed: "compactMap(_:)", message: "Please use compactMap(_:) for the case where closure returns an optional value")
+    public func flatMap<ElementOfResult>(_ transform: (Element) -> ElementOfResult?) -> SynchronizedArray<ElementOfResult> {
+        let function = flatMap as ((Element) throws -> ElementOfResult?) throws -> SynchronizedArray<ElementOfResult>
+        return try! function(transform)
+    }
+
+    @available(swift, deprecated: 4.1, renamed: "compactMap(_:)", message: "Please use compactMap(_:) for the case where closure returns an optional value")
+    public func flatMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) throws -> SynchronizedArray<ElementOfResult> {
+        var result: SynchronizedArray<ElementOfResult>!
+        var queueError: Error?
+        self.queue.sync {
+            do {
+                try result = SynchronizedArray<ElementOfResult>(self.array.compactMap(transform))
+            } catch let error {
+                queueError = error
+            }
+        }
+        if queueError != nil {
+            throw queueError!
+        }
+        return result
+    }
+
+    // Needs to be defined with and without throws because rethrows is not possible in queue
+    public func withContiguousMutableStorageIfAvailable<R>(_ body: (inout UnsafeMutableBufferPointer<Element>) -> R) -> R? {
+        let function = withContiguousMutableStorageIfAvailable as ((inout UnsafeMutableBufferPointer<Element>) throws -> R) throws -> R?
+        return try! function(body)
+    }
+
+    public func withContiguousMutableStorageIfAvailable<R>(_ body: (inout UnsafeMutableBufferPointer<Element>) throws -> R) throws -> R? {
+        var result: R?
+        var queueError: Error?
+        self.queue.sync {
+            do {
+                try result = self.array.withContiguousMutableStorageIfAvailable(body)
+            } catch let error {
+                queueError = error
+            }
+        }
+        if queueError != nil {
+            throw queueError!
+        }
+        return result
+    }
+
+    // TODO public subscript(bounds: Range<Int>) -> Slice<Array<Element>> {
+
+    public func swapAt(_ i: Int, _ j: Int, completion: (() -> Void)? = nil) {
+        self.queue.async(flags: .barrier) {
+            self.array.swapAt(i, j)
+            self.completionQueue.async(flags: .barrier) { completion?() }
+        }
+    }
+
+    public var indices: Range<Int> {
+        var result: Range<Int>!
+        self.queue.sync { result = self.array.indices }
+        return result
+    }
+
+    // TODO public subscript<R>(r: R) -> ArraySlice<Element> where R : RangeExpression, Self.Index == R.Bound { get }
+
+    // TODO public subscript(x: (UnboundedRange_) -> ()) -> ArraySlice<Element> { get }
+
+    // TODO public subscript<R>(r: R) -> ArraySlice<Element> where R : RangeExpression, Self.Index == R.Bound
+
+    // TODO public subscript(x: (UnboundedRange_) -> ()) -> ArraySlice<Element>
+
+    public convenience init(repeating repeatedValue: Element, count: Int) {
+        self.init()
+        self.array = Array(repeating: repeatedValue, count: count)
+    }
+
+    public convenience init<S>(_ elements: S) where S : Sequence, Element == S.Element {
+        self.init()
+        self.array = Array(elements)
+    }
 
     public func append(_ newElement: __owned Element, completion: (() -> Void)? = nil) {
         self.queue.async(flags: .barrier) {
@@ -244,14 +413,146 @@ public class SynchronizedArray<Element> {
         }
     }
 
-    public func append<S>(contentsOf newElements: __owned S, completion: (() -> Void)? = nil) where Element == S.Element, S: Sequence {
+    public func append(contentsOf newElements: SynchronizedArray, completion: (() -> Void)? = nil) {
+        var newElementsArray: [Element] = []
+        newElements.queue.sync { newElementsArray = newElements.array }
+        self.queue.async(flags: .barrier) {
+            self.array.append(contentsOf: newElementsArray)
+            self.completionQueue.async(flags: .barrier) { completion?() }
+        }
+    }
+
+    public func append<S>(contentsOf newElements: __owned S, completion: (() -> Void)? = nil) where S : Sequence, Element == S.Element {
         self.queue.async(flags: .barrier) {
             self.array.append(contentsOf: newElements)
             self.completionQueue.async(flags: .barrier) { completion?() }
         }
     }
 
-    
+    public func insert(_ newElement: __owned Element, at i: Int, completion: (() -> Void)? = nil) {
+        self.queue.async(flags: .barrier) {
+            self.array.insert(newElement, at: i)
+            self.completionQueue.async(flags: .barrier) { completion?() }
+        }
+    }
+
+    //########################
+    public func insert<C>(contentsOf newElements: __owned C, at i: Int) where C : Collection, Element == C.Element {
+    }
+
+    public func remove(at position: Int) -> Element {
+        return self.array[0]
+    }
+
+    public func removeSubrange(_ bounds: Range<Int>) {
+    }
+
+    public func removeFirst(_ k: Int) {
+    }
+
+    public func removeFirst() -> Element {
+        return self.array[0]
+    }
+
+    public func removeAll(keepingCapacity keepCapacity: Bool = false) {
+    }
+
+    public func reserveCapacity(_ n: Int) {
+    }
+
+    // TODO public func replaceSubrange<C, R>(_ subrange: R, with newElements: __owned C) where C : Collection, R : RangeExpression, Element == C.Element, Self.Index == R.Bound {
+
+    // TODO public func removeSubrange<R>(_ bounds: R) where R : RangeExpression, Self.Index == R.Bound {
+
+    public func popLast() -> Element? {
+        return self.array[0]
+    }
+
+    public func removeLast() -> Element {
+        return self.array[0]
+    }
+
+    public func removeLast(_ k: Int) {
+    }
+
+    // TODO  public static func + <Other>(lhs: Array<Element>, rhs: Other) -> Array<Element> where Other : Sequence, Self.Element == Other.Element {
+
+    // TODO  public static func + <Other>(lhs: Other, rhs: Array<Element>) -> Array<Element> where Other : Sequence, Self.Element == Other.Element {
+
+    // TODO  public static func += <Other>(lhs: inout Array<Element>, rhs: Other) where Other : Sequence, Self.Element == Other.Element {
+
+    // TODO  public static func + <Other>(lhs: Array<Element>, rhs: Other) -> Array<Element> where Other : RangeReplaceableCollection, Self.Element == Other.Element {
+
+    public func removeAll(where shouldBeRemoved: (Element) throws -> Bool) rethrows {
+    }
+
+    public func reverse() {
+    }
+
+    // TODO public __consuming func reversed() -> ReversedCollection<Array<Element>>
+
+    public var underestimatedCount: Int {
+        return 0
+    }
+
+    public func forEach(_ body: (Element) throws -> Void) rethrows {
+    }
+
+    public func first(where predicate: (Element) throws -> Bool) rethrows -> Element? {
+        return self.array[0]
+    }
+
+    public func withContiguousStorageIfAvailable<R>(_ body: (UnsafeBufferPointer<Element>) throws -> R) rethrows -> R? {
+        return try self.array.withContiguousStorageIfAvailable(body)
+    }
+
+    // TODO public func enumerated() -> EnumeratedSequence<Array<Element>>
+
+    @warn_unqualified_access
+    public func min(by areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows -> Element? {
+        return self.array[0]
+    }
+
+    public func max(by areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows -> Element? {
+        return self.array[0]
+    }
+
+    public func starts<PossiblePrefix>(with possiblePrefix: PossiblePrefix, by areEquivalent: (Element, PossiblePrefix.Element) throws -> Bool) rethrows -> Bool where PossiblePrefix : Sequence {
+        return false
+    }
+
+    public func elementsEqual<OtherSequence>(_ other: OtherSequence, by areEquivalent: (Element, OtherSequence.Element) throws -> Bool) rethrows -> Bool where OtherSequence : Sequence {
+        return false
+    }
+
+    // TODO public func lexicographicallyPrecedes<OtherSequence>(_ other: OtherSequence, by areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows -> Bool where OtherSequence : Sequence, Self.Element == OtherSequence.Element {
+
+    public func contains(where predicate: (Element) throws -> Bool) rethrows -> Bool {
+        return false
+    }
+
+    public func allSatisfy(_ predicate: (Element) throws -> Bool) rethrows -> Bool {
+        return false
+    }
+
+    func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
+        return initialResult
+    }
+
+    func reduce<Result>(into initialResult: __owned Result, _ updateAccumulatingResult: (inout Result, Element) throws -> ()) rethrows -> Result {
+        return initialResult
+    }
+
+    // TODO public func flatMap<SegmentOfResult>(_ transform: (Element) throws -> SegmentOfResult) rethrows -> [SegmentOfResult.Element] where SegmentOfResult : Sequence {
+
+    // TODO public func compactMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
+
+    public func sorted(by areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows -> [Element] {
+        return []
+    }
+
+    public func sort(by areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows {
+    }
 
     // MARK: - Helper
 
@@ -271,6 +572,19 @@ public class SynchronizedArray<Element> {
         }
     }
 }
+
+// MARK: - Comparable element
+
+public extension SynchronizedArray where Element : Comparable {
+
+    func sorted() -> SynchronizedArray {
+        var result: SynchronizedArray!
+        self.queue.sync { result = SynchronizedArray(self.array.sorted()) }
+        return result
+    }
+
+}
+
 
 // MARK: - Equatable element
 
