@@ -35,6 +35,8 @@ class ArrayTests: XCTestCase {
     let array1Repeated = Array<Int>([0, 0, 0, 0, 0])
     let array1Appended = Array<Int>([0, 1, 2, 3, 4, 5])
     let array1Inserted = Array<Int>([0, 5, 1, 2, 3, 4])
+    let array1InsertedContentsOf = Array<Int>([0, 1, 5, 6, 7, 8, 9, 2, 3, 4])
+    let array1Removed = Array<Int>([0, 1, 2, 4])
 
     override func setUp() {
         self.array1 = Array<Int>([0, 1, 2, 3, 4])
@@ -405,6 +407,23 @@ class ArrayTests: XCTestCase {
 
         // 3. Assert
         XCTAssertEqual(self.array1, self.array1Inserted)
+    }
+
+    func testInsertContentsOf() {
+        // 2. Action
+        self.array1.insert(contentsOf: 5..<10, at: 2)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1InsertedContentsOf)
+    }
+
+    func testRemove() {
+        // 2. Action
+        let removed = self.array1.remove(at: 3)
+
+        // 3. Assert
+        XCTAssertEqual(removed, 3)
+        XCTAssertEqual(self.array1, self.array1Removed)
     }
 
 }
