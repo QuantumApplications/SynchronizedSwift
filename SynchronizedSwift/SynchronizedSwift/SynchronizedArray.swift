@@ -36,14 +36,12 @@ public class SynchronizedArray<Element> {
 
     // MARK: - Array
 
-    // Sync because reading
     public var capacity: Int {
         var capacity: Int!
         self.queue.sync { capacity = self.array.capacity}
         return capacity
     }
 
-    // Sync because reading
     // Barrier because mutating
     public static func + (lhs: SynchronizedArray, rhs: SynchronizedArray) -> SynchronizedArray {
         var result: SynchronizedArray!
@@ -53,7 +51,6 @@ public class SynchronizedArray<Element> {
         return result
     }
 
-    // Sync because reading
     // Barrier because mutating
     public static func + (lhs: SynchronizedArray, rhs: [Element]) -> SynchronizedArray {
         var result: SynchronizedArray!
@@ -61,7 +58,6 @@ public class SynchronizedArray<Element> {
         return result
     }
 
-    // Sync because reading
     // Barrier because mutating
     public static func += (lhs: inout SynchronizedArray, rhs: SynchronizedArray) {
         var rhsArray: [Element] = []
@@ -71,7 +67,6 @@ public class SynchronizedArray<Element> {
         }
     }
 
-    // Sync because reading
     // Barrier because mutating
     public static func += (lhs: inout SynchronizedArray, rhs: [Element]) {
         lhs.queue.sync(flags: .barrier) {
@@ -85,7 +80,6 @@ public class SynchronizedArray<Element> {
         return try! function(body)
     }
 
-    // Sync because reading
     public func withUnsafeBufferPointer<R>(_ body: (UnsafeBufferPointer<Element>) throws -> R) throws -> R {
         var result: R!
         var queueError: Error?
@@ -107,7 +101,6 @@ public class SynchronizedArray<Element> {
         let function = withUnsafeMutableBufferPointer as ((inout UnsafeMutableBufferPointer<Element>) throws -> R) throws -> R
         return try! function(body)
     }
-    // Sync because reading
     // Barrier because mutating
     public func withUnsafeMutableBufferPointer<R>(_ body: (inout UnsafeMutableBufferPointer<Element>) throws -> R) throws -> R {
         var result: R!
@@ -125,13 +118,9 @@ public class SynchronizedArray<Element> {
         return result
     }
 
-    // Async because writing only
     // Barrier because mutating
-    public func replaceSubrange<C>(_ subrange: Range<Int>, with newElements: __owned C, completion: (() -> Void)? = nil) where Element == C.Element, C : Collection {
-        self.queue.async(flags: .barrier) {
-            self.array.replaceSubrange(subrange, with: newElements)
-            self.completionQueue.async(flags: .barrier) { completion?() }
-        }
+    public func replaceSubrange<C>(_ subrange: Range<Int>, with newElements: __owned C) where Element == C.Element, C : Collection {
+        self.queue.sync(flags: .barrier) { self.array.replaceSubrange(subrange, with: newElements) }
     }
 
     // Needs to be defined with and without throws because rethrows is not possible in queue
@@ -140,7 +129,6 @@ public class SynchronizedArray<Element> {
         return try! function(body)
     }
 
-    // Sync because reading
     // Barrier because mutating
     public func withUnsafeMutableBytes<R>(_ body: (UnsafeMutableRawBufferPointer) throws -> R) throws -> R {
         var result: R!
@@ -164,7 +152,6 @@ public class SynchronizedArray<Element> {
         return try! function(body)
     }
 
-    // Sync because reading
     public func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) throws -> R {
         var result: R!
         var queueError: Error?
@@ -191,7 +178,6 @@ public class SynchronizedArray<Element> {
         return try! function(transform)
     }
 
-    // Sync because reading
     public func map<T>(_ transform: (Element) throws -> T) throws -> SynchronizedArray<T> {
         var result: SynchronizedArray<T>!
         var queueError: Error?
@@ -236,7 +222,6 @@ public class SynchronizedArray<Element> {
         return try! function(predicate)
     }
 
-    // Sync because reading
     public func firstIndex(where predicate: (Element) throws -> Bool) throws -> Int? {
         var result: Int?
         var queueError: Error?
@@ -259,7 +244,6 @@ public class SynchronizedArray<Element> {
         return try! function(predicate)
     }
 
-    // Sync because reading
     public func last(where predicate: (Element) throws -> Bool) throws -> Element? {
         var result: Element?
         var queueError: Error?
@@ -282,7 +266,6 @@ public class SynchronizedArray<Element> {
         return try! function(predicate)
     }
 
-    // Sync because reading
     public func lastIndex(where predicate: (Element) throws -> Bool) throws -> Int? {
         var result: Int?
         var queueError: Error?
@@ -305,7 +288,6 @@ public class SynchronizedArray<Element> {
         return try! function(belongsInSecondPartition)
     }
 
-    // Sync because reading
     public func partition(by belongsInSecondPartition: (Element) throws -> Bool) throws -> Int {
         var result: Int!
         var queueError: Error?
@@ -322,33 +304,26 @@ public class SynchronizedArray<Element> {
         return result
     }
 
-    // Sync because reading
     public func shuffled<T>(using generator: inout T) -> SynchronizedArray where T : RandomNumberGenerator {
         var result: SynchronizedArray!
         self.queue.sync { result = SynchronizedArray(self.array.shuffled(using: &generator)) }
         return result
     }
 
-    // Sync because reading
     public func shuffled() -> SynchronizedArray {
         var result: SynchronizedArray!
         self.queue.sync { result = SynchronizedArray(self.array.shuffled()) }
         return result
     }
 
-    // Sync because reading
     // Barrier because mutating
     public func shuffle<T>(using generator: inout T) where T : RandomNumberGenerator {
         self.queue.sync(flags: .barrier) { self.array.shuffle(using: &generator) }
     }
 
-    // Async because writing only
     // Barrier because mutating
     public func shuffle(completion: (() -> Void)? = nil) {
-        self.queue.async(flags: .barrier) {
-            self.array.shuffle()
-            self.completionQueue.async(flags: .barrier) { completion?() }
-        }
+        self.queue.sync(flags: .barrier) { self.array.shuffle() }
     }
 
     // TODO public var lazy: LazySequence<Array<Element>> { get }
@@ -360,7 +335,6 @@ public class SynchronizedArray<Element> {
         return try! function(transform)
     }
 
-    // Sync because reading
     @available(swift, deprecated: 4.1, renamed: "compactMap(_:)", message: "Please use compactMap(_:) for the case where closure returns an optional value")
     public func flatMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) throws -> SynchronizedArray<ElementOfResult> {
         var result: SynchronizedArray<ElementOfResult>!
@@ -384,7 +358,6 @@ public class SynchronizedArray<Element> {
         return try! function(body)
     }
 
-    // Sync because reading
     // Barrier because mutating
     public func withContiguousMutableStorageIfAvailable<R>(_ body: (inout UnsafeMutableBufferPointer<Element>) throws -> R) throws -> R? {
         var result: R?
@@ -404,13 +377,9 @@ public class SynchronizedArray<Element> {
 
     // TODO public subscript(bounds: Range<Int>) -> Slice<Array<Element>> {
 
-    // Async because writing only
     // Barrier because mutating
     public func swapAt(_ i: Int, _ j: Int, completion: (() -> Void)? = nil) {
-        self.queue.async(flags: .barrier) {
-            self.array.swapAt(i, j)
-            self.completionQueue.async(flags: .barrier) { completion?() }
-        }
+        self.queue.sync(flags: .barrier) { self.array.swapAt(i, j) }
     }
 
     // Sync because reading
@@ -438,13 +407,9 @@ public class SynchronizedArray<Element> {
         self.array = Array(elements)
     }
 
-    // Async because writing only
     // Barrier because mutating
     public func append(_ newElement: __owned Element, completion: (() -> Void)? = nil) {
-        self.queue.async(flags: .barrier) {
-            self.array.append(newElement)
-            self.completionQueue.async(flags: .barrier) { completion?() }
-        }
+        self.queue.sync(flags: .barrier) { self.array.append(newElement) }
     }
 
     // Async because writing only
@@ -458,71 +423,76 @@ public class SynchronizedArray<Element> {
         }
     }
 
-    // Async because writing only
     // Barrier because mutating
     public func append<S>(contentsOf newElements: __owned S, completion: (() -> Void)? = nil) where S : Sequence, Element == S.Element {
-        self.queue.async(flags: .barrier) {
-            self.array.append(contentsOf: newElements)
-            self.completionQueue.async(flags: .barrier) { completion?() }
-        }
+        self.queue.sync(flags: .barrier) { self.array.append(contentsOf: newElements) }
     }
 
-    // Async because writing only
     // Barrier because mutating
     public func insert(_ newElement: __owned Element, at i: Int, completion: (() -> Void)? = nil) {
-        self.queue.async(flags: .barrier) {
-            self.array.insert(newElement, at: i)
-            self.completionQueue.async(flags: .barrier) { completion?() }
-        }
+        self.queue.sync(flags: .barrier) { self.array.insert(newElement, at: i) }
     }
 
-    // Async because writing only
     // Barrier because mutating
     public func insert<C>(contentsOf newElements: __owned C, at i: Int, completion: (() -> Void)? = nil) where C : Collection, Element == C.Element {
-        self.queue.async(flags: .barrier) {
-            self.array.insert(contentsOf: newElements, at: i)
-            self.completionQueue.async(flags: .barrier) { completion?() }
-        }
+        self.queue.sync(flags: .barrier) { self.array.insert(contentsOf: newElements, at: i) }
     }
 
-    // Sync because reading
     // Barrier because mutating
     public func remove(at position: Int, completion: (() -> Void)? = nil) -> Element {
         var result: Element!
-        self.queue.sync { result = self.array.remove(at: position) }
+        self.queue.sync(flags: .barrier) { result = self.array.remove(at: position) }
         return result
     }
 
-    //########################
+    // Barrier because mutating
     public func removeSubrange(_ bounds: Range<Int>) {
+        self.queue.sync(flags: .barrier) { self.array.removeSubrange(bounds) }
     }
 
+    // Barrier because mutating
     public func removeFirst(_ k: Int) {
+        self.queue.sync(flags: .barrier) { self.array.removeFirst(k) }
     }
 
+    // Barrier because mutating
     public func removeFirst() -> Element {
-        return self.array[0]
+        var result: Element!
+        self.queue.sync(flags: .barrier) { result = self.array.removeFirst() }
+        return result
     }
 
+    // Barrier because mutating
     public func removeAll(keepingCapacity keepCapacity: Bool = false) {
+        self.queue.sync(flags: .barrier) { self.array.removeAll(keepingCapacity: keepCapacity) }
     }
 
+    // Barrier because mutating
     public func reserveCapacity(_ n: Int) {
+        self.queue.sync(flags: .barrier) { self.array.reserveCapacity(n) }
     }
 
     // TODO public func replaceSubrange<C, R>(_ subrange: R, with newElements: __owned C) where C : Collection, R : RangeExpression, Element == C.Element, Self.Index == R.Bound {
 
     // TODO public func removeSubrange<R>(_ bounds: R) where R : RangeExpression, Self.Index == R.Bound {
 
+    // Barrier because mutating
     public func popLast() -> Element? {
-        return self.array[0]
+        var result: Element!
+        self.queue.sync(flags: .barrier) { result = self.array.popLast() }
+        return result
     }
 
+    // Barrier because mutating
     public func removeLast() -> Element {
-        return self.array[0]
+        var result: Element!
+        self.queue.sync(flags: .barrier) { result = self.array.removeLast() }
+        return result
     }
 
+    // Barrier because mutating
     public func removeLast(_ k: Int) {
+        self.queue.sync(flags: .barrier) { self.array.removeLast(k) }
     }
 
     // TODO  public static func + <Other>(lhs: Array<Element>, rhs: Other) -> Array<Element> where Other : Sequence, Self.Element == Other.Element {
@@ -533,6 +503,7 @@ public class SynchronizedArray<Element> {
 
     // TODO  public static func + <Other>(lhs: Array<Element>, rhs: Other) -> Array<Element> where Other : RangeReplaceableCollection, Self.Element == Other.Element {
 
+    //########################
     public func removeAll(where shouldBeRemoved: (Element) throws -> Bool) rethrows {
     }
 

@@ -37,6 +37,13 @@ class ArrayTests: XCTestCase {
     let array1Inserted = Array<Int>([0, 5, 1, 2, 3, 4])
     let array1InsertedContentsOf = Array<Int>([0, 1, 5, 6, 7, 8, 9, 2, 3, 4])
     let array1Removed = Array<Int>([0, 1, 2, 4])
+    let array1RemovedSubrange = Array<Int>([0, 4])
+    let array1RemovedFirstK = Array<Int>([2, 3, 4])
+    let array1RemovedFirst = Array<Int>([1, 2, 3, 4])
+    let empyArray = Array<Int>()
+    let newCapacity = 10
+    let array1RemovedLast = Array<Int>([0, 1, 2, 3])
+    let array1RemovedLastK = Array<Int>([0, 1, 2])
 
     override func setUp() {
         self.array1 = Array<Int>([0, 1, 2, 3, 4])
@@ -424,6 +431,74 @@ class ArrayTests: XCTestCase {
         // 3. Assert
         XCTAssertEqual(removed, 3)
         XCTAssertEqual(self.array1, self.array1Removed)
+    }
+
+    func testRemoveSubrange() {
+        // 2. Action
+        self.array1.removeSubrange(1..<4)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1RemovedSubrange)
+    }
+
+    func testRemoveFirstK() {
+        // 2. Action
+        self.array1.removeFirst(2)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1RemovedFirstK)
+    }
+
+    func testRemoveFirst() {
+        // 2. Action
+        let removed = self.array1.removeFirst()
+
+        // 3. Assert
+        XCTAssertEqual(removed, 0)
+        XCTAssertEqual(self.array1, self.array1RemovedFirst)
+    }
+
+    func testRemoveAll() {
+        // 2. Action
+        self.array1.removeAll(keepingCapacity: true)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.empyArray)
+        XCTAssertEqual(self.array1.capacity, self.array1Capacity)
+    }
+
+    func testReserveCapacity() {
+        // 2. Action
+        self.array1.reserveCapacity(self.newCapacity)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1.capacity, self.newCapacity)
+    }
+
+    func testPopLast() {
+        // 2. Action
+        let last = self.array1.popLast()
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1RemovedLast)
+        XCTAssertEqual(last, self.array1Last)
+    }
+
+    func testRemoveLast() {
+        // 2. Action
+        let last = self.array1.removeLast()
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1RemovedLast)
+        XCTAssertEqual(last, self.array1Last)
+    }
+
+    func testRemoveLastK() {
+        // 2. Action
+        self.array1.removeLast(2)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1RemovedLastK)
     }
 
 }

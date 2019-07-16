@@ -34,6 +34,13 @@ class SynchronizedArrayTests: XCTestCase {
     let array1Inserted = SynchronizedArray<Int>([0, 5, 1, 2, 3, 4])
     let array1InsertedContentsOf = SynchronizedArray<Int>([0, 1, 5, 6, 7, 8, 9, 2, 3, 4])
     let array1Removed = SynchronizedArray<Int>([0, 1, 2, 4])
+    let array1RemovedSubrange = SynchronizedArray<Int>([0, 4])
+    let array1RemovedFirstK = SynchronizedArray<Int>([2, 3, 4])
+    let array1RemovedFirst = SynchronizedArray<Int>([1, 2, 3, 4])
+    let empyArray = SynchronizedArray<Int>()
+    let newCapacity = 10
+    let array1RemovedLast = SynchronizedArray<Int>([0, 1, 2, 3])
+    let array1RemovedLastK = SynchronizedArray<Int>([0, 1, 2])
 
     override func setUp() {
         self.array1 = SynchronizedArray<Int>([0, 1, 2, 3, 4])
@@ -130,10 +137,10 @@ class SynchronizedArrayTests: XCTestCase {
 
     func testReplaceSubrange() {
         // 2. Action
-        self.array1.replaceSubrange(1..<4, with: repeatElement(1, count: 5)) {
-            // 3. Assert
-            XCTAssertEqual(self.array1, self.array1ReplacedSubrage)
-        }
+        self.array1.replaceSubrange(1..<4, with: repeatElement(1, count: 5))
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1ReplacedSubrage)
     }
 
     func testWithUnsafeMutableBytes() {
@@ -319,10 +326,10 @@ class SynchronizedArrayTests: XCTestCase {
 
     func testShuffle() {
         // 2. Action
-        self.array1.shuffle() {
-            // 3. Assert
-            XCTAssertNotEqual(self.array1, self.array2)
-        }
+        self.array1.shuffle()
+
+        // 3. Assert
+        XCTAssertNotEqual(self.array1, self.array2)
     }
 
     func testFlatMap() {
@@ -373,11 +380,11 @@ class SynchronizedArrayTests: XCTestCase {
     }
 
     func testSwapAt() {
-        // 2. Action
-        self.array1.swapAt(0, 1) {
-            // 3. Assert
-            XCTAssertEqual(self.array1, self.array1SwappedAt1)
-        }
+        // 2.Action
+        self.array1.swapAt(0, 1)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1SwappedAt1)
     }
 
     func testIndices() {
@@ -397,42 +404,42 @@ class SynchronizedArrayTests: XCTestCase {
 
     func testAppend() {
         // 2. Action
-        self.array1.append(5) {
-            // 3. Assert
-            XCTAssertEqual(self.array1, self.array1Appended)
-        }
+        self.array1.append(5)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1Appended)
     }
 
     func testAppendSynchronized() {
         // 2. Action
-        self.array1.append(contentsOf: self.array2) {
-            // 3. Assert
-            XCTAssertEqual(self.array1, self.addedArray)
-        }
+        self.array1.append(contentsOf: self.array2)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.addedArray)
     }
 
     func testAppendSequenceNonSynchronized() {
         // 2. Action
-        self.array1.append(contentsOf: self.nonSynchronizedArray2) {
-            // 3. Assert
-            XCTAssertEqual(self.array1, self.addedArray)
-        }
+        self.array1.append(contentsOf: self.nonSynchronizedArray2)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.addedArray)
     }
 
     func testInsert() {
         // 2. Action
-        self.array1.insert(5, at: 1) {
-            // 3. Assert
-            XCTAssertEqual(self.array1, self.array1Inserted)
-        }
+        self.array1.insert(5, at: 1)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1Inserted)
     }
 
     func testInsertContentsOf() {
         // 2. Action
-        self.array1.insert(contentsOf: 5..<10, at: 2) {
-            // 3. Assert
-            XCTAssertEqual(self.array1, self.array1InsertedContentsOf)
-        }
+        self.array1.insert(contentsOf: 5..<10, at: 2)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1InsertedContentsOf)
     }
 
     func testRemove() {
@@ -442,6 +449,74 @@ class SynchronizedArrayTests: XCTestCase {
         // 3. Assert
         XCTAssertEqual(removed, 3)
         XCTAssertEqual(self.array1, self.array1Removed)
+    }
+
+    func testRemoveSubrange() {
+        // 2. Action
+        self.array1.removeSubrange(1..<4)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1RemovedSubrange)
+    }
+
+    func testRemoveFirstK() {
+        // 2. Action
+        self.array1.removeFirst(2)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1RemovedFirstK)
+    }
+
+    func testRemoveFirst() {
+        // 2. Action
+        let removed = self.array1.removeFirst()
+
+        // 3. Assert
+        XCTAssertEqual(removed, 0)
+        XCTAssertEqual(self.array1, self.array1RemovedFirst)
+    }
+
+    func testRemoveAll() {
+        // 2. Action
+        self.array1.removeAll(keepingCapacity: true)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.empyArray)
+        XCTAssertEqual(self.array1.capacity, self.array1Capacity)
+    }
+
+    func testReserveCapacity() {
+        // 2. Action
+        self.array1.reserveCapacity(self.newCapacity)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1.capacity, self.newCapacity)
+    }
+
+    func testPopLast() {
+        // 2. Action
+        let last = self.array1.popLast()
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1RemovedLast)
+        XCTAssertEqual(last, self.array1Last)
+    }
+
+    func testRemoveLast() {
+        // 2. Action
+        let last = self.array1.removeLast()
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1RemovedLast)
+        XCTAssertEqual(last, self.array1Last)
+    }
+
+    func testRemoveLastK() {
+        // 2. Action
+        self.array1.removeLast(2)
+
+        // 3. Assert
+        XCTAssertEqual(self.array1, self.array1RemovedLastK)
     }
 
 }
